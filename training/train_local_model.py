@@ -10,6 +10,10 @@ from torch.utils.data import DataLoader
 
 from clearml import Task
 
+Task.force_requirements_env_freeze(
+    requirements_file="requirements.txt"
+)
+
 task = Task.init(
     project_name="Neural-Network-CICD",
     task_name="Local CNN Training"
