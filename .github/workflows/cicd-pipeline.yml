@@ -43,7 +43,7 @@ jobs:
           test -f model_cd/register_model.py
           test -f model_cd/deploy_model.py
           test -f model_cd/validate_endpoint.py
-          test -f model_cd/clearml_model_cd.py
+          test -f model_cd/clearml_model_cd_pipeline.py
           test -f model_cd/run_model_cd.py
 
           test -f app/serve_model.py
