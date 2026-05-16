@@ -9,7 +9,7 @@ task = Task.init(
 )
 
 TRIGGER_FILE = Path("feedback/new_data_trigger.json")
-TRAINING_SCRIPT = "training/train_local_cnn.py"
+TRAINING_SCRIPT = "training/train_local_model.py"
 
 # Log config to ClearML
 task.connect({

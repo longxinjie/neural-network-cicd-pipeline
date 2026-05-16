@@ -1,6 +1,6 @@
 {
   "new_data_received": true,
   "source": "simulated_new_mnist_data",
-  "created_at": "2026-05-16T19:39:29.626318",
+  "created_at": "2026-05-16T22:08:05.263743",
   "reason": "New production-like data received for retraining demo"
 }
