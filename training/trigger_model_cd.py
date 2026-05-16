@@ -10,7 +10,16 @@ task = Task.init(
 handoff_file = Path("artifacts/approved_checkpoint.json")
 
 if not handoff_file.exists():
-    raise FileNotFoundError("No approved checkpoint found. Model CD will not run.")
+    print("No approved checkpoint found yet. This is expected if running this task alone.")
+    print("Task registered successfully. Model CD will only run after validation creates the handoff file.")
+    task.upload_artifact(
+        name="trigger_status",
+        artifact_object={
+            "model_cd_triggered": False,
+            "reason": "No approved checkpoint found"
+        }
+    )
+    exit(0)
 
 print("Approved checkpoint found.")
 print("Triggering Model CD pipeline...")
@@ -23,6 +32,14 @@ subprocess.run(
 task.upload_artifact(
     name="approved_checkpoint_handoff",
     artifact_object=str(handoff_file)
+)
+
+task.upload_artifact(
+    name="trigger_status",
+    artifact_object={
+        "model_cd_triggered": True,
+        "reason": "Approved checkpoint found"
+    }
 )
 
 print("Model CD pipeline triggered.")
