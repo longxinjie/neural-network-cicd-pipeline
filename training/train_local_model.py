@@ -8,6 +8,12 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 
+from clearml import Task
+
+task = Task.init(
+    project_name="Neural-Network-CICD",
+    task_name="Local CNN Training"
+)
 
 CHECKPOINT_DIR = Path("artifacts/trained_checkpoints")
 CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
@@ -132,6 +138,21 @@ def train():
     print(f"Metadata saved to: {metadata_path}")
     print(f"Training accuracy: {train_accuracy:.4f}")
     print(f"Training loss: {avg_loss:.4f}")
+
+    task.upload_artifact(
+        name="trained_checkpoint",
+        artifact_object=str(checkpoint_path)
+    )
+
+    task.upload_artifact(
+        name="training_metadata",
+        artifact_object=str(metadata_path)
+    )
+
+    task.upload_artifact(
+        name="training_summary",
+        artifact_object=metadata
+    )
 
 
 if __name__ == "__main__":

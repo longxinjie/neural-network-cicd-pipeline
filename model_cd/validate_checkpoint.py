@@ -9,6 +9,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, classification_report
 
+from clearml import Task
+
+task = Task.init(
+    project_name="Neural-Network-CICD",
+    task_name="Validate Checkpoint"
+)
 
 CHECKPOINT_DIR = Path("artifacts/trained_checkpoints")
 OUTPUT_DIR = Path("reports")
@@ -168,6 +174,10 @@ def validate():
     print(validation_result)
     print(f"Approved model saved to: {approved_path}")
 
+    task.upload_artifact("validation_result", "reports/validation_result.json")
+    task.upload_artifact("classification_report", "reports/classification_report.json")
+    task.upload_artifact("confusion_matrix", "reports/figures/confusion_matrix.png")
+    task.upload_artifact("validation_decision", "reports/figures/validation_decision.png")
 
 if __name__ == "__main__":
     validate()

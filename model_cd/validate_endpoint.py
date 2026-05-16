@@ -3,6 +3,13 @@ from pathlib import Path
 import requests
 from PIL import Image, ImageDraw
 
+from clearml import Task
+
+task = Task.init(
+    project_name="Neural-Network-CICD",
+    task_name="Validate Deployment Endpoint"
+)
+
 OUTPUT_DIR = Path("reports")
 FIGURE_DIR = Path("reports/figures")
 OUTPUT_DIR.mkdir(exist_ok=True)
@@ -46,6 +53,16 @@ result = {
 
 with open(OUTPUT_DIR / "endpoint_validation_result.json", "w") as f:
     json.dump(result, f, indent=2)
+
+task.upload_artifact(
+    name="endpoint_validation_result",
+    artifact_object="reports/endpoint_validation_result.json"
+)
+
+task.upload_artifact(
+    name="sample_digit_for_endpoint",
+    artifact_object=str(test_image_path)
+)
 
 print("Endpoint validation passed.")
 print(json.dumps(result, indent=2))

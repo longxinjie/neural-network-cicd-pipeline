@@ -3,6 +3,13 @@ import shutil
 from pathlib import Path
 from datetime import datetime
 
+from clearml import Task
+
+task = Task.init(
+    project_name="Neural-Network-CICD",
+    task_name="Deploy Model to Staging"
+)
+
 MODEL_PATH = Path("model_package/approved_model.pt")
 METADATA_PATH = Path("model_package/approved_model_metadata.json")
 
@@ -32,6 +39,11 @@ deployment_manifest = {
 
 with open(DEPLOY_DIR / "deployment_manifest.json", "w") as f:
     json.dump(deployment_manifest, f, indent=2)
+
+task.upload_artifact(
+    name="deployment_manifest",
+    artifact_object="artifacts/deployed_model/deployment_manifest.json"
+)
 
 print("Model deployed to staging.")
 print(json.dumps(deployment_manifest, indent=2))

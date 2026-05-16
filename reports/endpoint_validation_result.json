@@ -1,20 +1,20 @@
 {
   "endpoint": "http://127.0.0.1:5000",
   "health_check": {
-    "accuracy": 0.958,
+    "accuracy": 0.9322,
     "model_architecture": null,
     "model_loaded": true,
     "status": "healthy"
   },
   "prediction_response": {
-    "confidence": 0.2101,
+    "confidence": 0.3806,
     "model_metadata": {
-      "accuracy": 0.958,
-      "checkpoint": "artifacts\\trained_checkpoints\\mnist_cnn_checkpoint_20260516_145240.pt",
+      "accuracy": 0.9322,
+      "checkpoint": "artifacts\\trained_checkpoints\\mnist_cnn_checkpoint_20260516_165532.pt",
       "min_accuracy": 0.8,
       "status": "PASSED"
     },
-    "predicted_digit": 7
+    "predicted_digit": 5
   },
   "status": "PASSED"
 }

@@ -6,5 +6,13 @@
     "average_confidence": 0.8998,
     "prediction_volume": 111,
     "drift_score": 0.0785
+  },
+  {
+    "timestamp": "2026-05-16T17:00:32",
+    "model_version": "served_model",
+    "accuracy_estimate": 0.9467,
+    "average_confidence": 0.8429,
+    "prediction_volume": 82,
+    "drift_score": 0.0706
   }
 ]
