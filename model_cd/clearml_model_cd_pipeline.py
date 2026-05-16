@@ -11,7 +11,6 @@ pipe.set_default_execution_queue("default")
 
 pipe.add_step(
     name="register_model",
-    parents=["validate_checkpoint"],
     base_task_project="Neural-Network-CICD",
     base_task_name="Register Approved MNIST CNN Model",
 )
