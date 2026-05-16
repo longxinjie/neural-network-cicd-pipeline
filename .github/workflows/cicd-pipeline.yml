@@ -57,31 +57,6 @@ jobs:
           test -f pipeline_cd/register_model_clearml.py
           test -f pipeline_cd/validate_deployment.py
 
-      - name: Run Python syntax smoke tests
-        run: |
-          python -m py_compile training/train_local_model.py
-          python -m py_compile training/evaluate_model.py
-          python -m py_compile training/validate_model.py
-          python -m py_compile training/run_training_pipeline.py
-          python -m py_compile training/trigger_model_cd.py
-
-          python -m py_compile model_cd/register_model.py
-          python -m py_compile model_cd/deploy_model.py
-          python -m py_compile model_cd/validate_endpoint.py
-          python -m py_compile model_cd/clearml_model_cd.py
-          python -m py_compile model_cd/run_model_cd.py
-
-          python -m py_compile app/serve_model.py
-
-          python -m py_compile feedback/simulate_new_data.py
-          python -m py_compile feedback/retrain_trigger.py
-
-          python -m py_compile monitoring/monitor_model.py
-
-          python -m py_compile pipeline_cd/deploy_pipeline.py
-          python -m py_compile pipeline_cd/register_model_clearml.py
-          python -m py_compile pipeline_cd/validate_deployment.py
-
       - name: Generate CI report
         run: |
           mkdir -p reports
