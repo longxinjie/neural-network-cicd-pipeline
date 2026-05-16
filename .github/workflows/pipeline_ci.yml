@@ -1,0 +1,71 @@
+name: Neural Network Pipeline CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+  issues: write
+  statuses: write
+
+jobs:
+  pipeline-ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup CML
+        uses: iterative/setup-cml@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Check project structure
+        run: |
+          test -f training/train_local_model.py
+          test -f model_cd/validate_checkpoint.py
+          test -f model_cd/deploy_model.py
+          test -f app/serve_model.py
+          test -f monitoring/monitor_model.py
+
+      - name: Run pipeline smoke test
+        run: |
+          python -m py_compile training/train_local_model.py
+          python -m py_compile model_cd/validate_checkpoint.py
+          python -m py_compile model_cd/register_model.py
+          python -m py_compile model_cd/deploy_model.py
+          python -m py_compile model_cd/validate_endpoint.py
+          python -m py_compile app/serve_model.py
+          python -m py_compile monitoring/monitor_model.py
+
+      - name: Generate CI report
+        run: |
+          mkdir -p reports
+          echo '{ "pipeline_ci_status": "passed", "purpose": "validate ML pipeline code, not train production model" }' > reports/pipeline_ci_result.json
+
+      - name: Generate CML report
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "# Neural Network Pipeline CI Report" > report.md
+          echo "" >> report.md
+          echo "## Purpose" >> report.md
+          echo "This CI workflow validates the ML pipeline code and project structure." >> report.md
+          echo "" >> report.md
+          echo "It does not train or deploy a production model. Model training and model delivery are handled separately by the Model CD workflow." >> report.md
+          echo "" >> report.md
+          echo "## CI Result" >> report.md
+          cat reports/pipeline_ci_result.json >> report.md
+          cml comment create report.md
