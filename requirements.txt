@@ -1,0 +1,9 @@
+clearml
+flask
+requests
+matplotlib
+pandas
+numpy
+scikit-learn
+torch
+torchvision
