@@ -17,8 +17,8 @@
         "predicted_digit": 5
     },
     "status": "PASSED",
-    "health_latency_ms": 5.926847457885742,
-    "prediction_latency_ms": 18.04041862487793,
+    "health_latency_ms": 17.374277114868164,
+    "prediction_latency_ms": 22.07636833190918,
     "predicted_class": null,
     "prediction_confidence": 0.3806
 }

@@ -1,12 +1,12 @@
 {
     "deployment_stage": "staging",
     "status": "deployed",
-    "deployed_at": "2026-05-17T00:49:32.701718",
+    "deployed_at": "2026-05-17T00:59:21.319088",
     "model_file": "artifacts\\deployed_model\\served_model.pt",
     "metadata_file": "artifacts\\deployed_model\\served_model_metadata.json",
     "endpoint": "http://127.0.0.1:5000/predict",
     "health_endpoint": "http://127.0.0.1:5000/health",
     "model_size_mb": 0.4076375961303711,
-    "deployment_latency_seconds": 3.0320558547973633,
-    "flask_process_id": 11112
+    "deployment_latency_seconds": 3.021991729736328,
+    "flask_process_id": 32160
 }

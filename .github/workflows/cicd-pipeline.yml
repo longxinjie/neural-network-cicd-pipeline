@@ -35,24 +35,52 @@ jobs:
       - name: Check project structure
         run: |
           test -f training/train_local_model.py
-          test -f model_cd/validate_checkpoint.py
+          test -f training/evaluate_model.py
+          test -f training/validate_model.py
+          test -f training/run_training_pipeline.py
+          test -f training/trigger_model_cd.py
+
           test -f model_cd/register_model.py
           test -f model_cd/deploy_model.py
           test -f model_cd/validate_endpoint.py
-          test -f app/serve_model.py
-          test -f monitoring/monitor_model.py
-          test -f pipeline_cd/deploy_pipeline.py
+          test -f model_cd/clearml_model_cd.py
+          test -f model_cd/run_model_cd.py
 
-      - name: Run pipeline smoke test
+          test -f app/serve_model.py
+
+          test -f feedback/simulate_new_data.py
+          test -f feedback/retrain_trigger.py
+
+          test -f monitoring/monitor_model.py
+
+          test -f pipeline_cd/deploy_pipeline.py
+          test -f pipeline_cd/register_model_clearml.py
+          test -f pipeline_cd/validate_deployment.py
+
+      - name: Run Python syntax smoke tests
         run: |
           python -m py_compile training/train_local_model.py
-          python -m py_compile model_cd/validate_checkpoint.py
+          python -m py_compile training/evaluate_model.py
+          python -m py_compile training/validate_model.py
+          python -m py_compile training/run_training_pipeline.py
+          python -m py_compile training/trigger_model_cd.py
+
           python -m py_compile model_cd/register_model.py
           python -m py_compile model_cd/deploy_model.py
           python -m py_compile model_cd/validate_endpoint.py
+          python -m py_compile model_cd/clearml_model_cd.py
+          python -m py_compile model_cd/run_model_cd.py
+
           python -m py_compile app/serve_model.py
+
+          python -m py_compile feedback/simulate_new_data.py
+          python -m py_compile feedback/retrain_trigger.py
+
           python -m py_compile monitoring/monitor_model.py
+
           python -m py_compile pipeline_cd/deploy_pipeline.py
+          python -m py_compile pipeline_cd/register_model_clearml.py
+          python -m py_compile pipeline_cd/validate_deployment.py
 
       - name: Generate CI report
         run: |
