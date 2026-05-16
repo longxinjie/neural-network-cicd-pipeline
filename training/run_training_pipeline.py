@@ -36,4 +36,4 @@ pipe.add_step(
     base_task_name="Validate Checkpoint"
 )
 
-pipe.start_locally(run_pipeline_steps_locally=False)
+pipe.start_locally(run_pipeline_steps_locally=True)

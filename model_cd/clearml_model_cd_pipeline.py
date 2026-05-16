@@ -2,7 +2,7 @@ from clearml import PipelineController
 
 pipe = PipelineController(
     project="Neural-Network-CICD",
-    name="Model Continuous Delivery Pipeline",
+    name="Model CD Pipeline",
     version="1.0.0",
     add_pipeline_tags=True,
 )
