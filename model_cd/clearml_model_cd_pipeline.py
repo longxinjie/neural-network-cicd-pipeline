@@ -1,7 +1,5 @@
 from clearml import Task, PipelineController
 
-Task.set_reuse_time_window_in_hours(0)
-
 pipe = PipelineController(
     project="Neural-Network-CICD",
     name="Remote Model Continuous Delivery Pipeline",
