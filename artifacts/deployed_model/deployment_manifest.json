@@ -1,7 +1,9 @@
 {
   "deployment_stage": "staging",
   "status": "deployed",
-  "deployed_at": "2026-05-17T00:04:16.575579",
+  "deployed_at": "2026-05-17T00:37:36.071454",
   "model_file": "artifacts\\deployed_model\\served_model.pt",
-  "metadata_file": "artifacts\\deployed_model\\served_model_metadata.json"
+  "metadata_file": "artifacts\\deployed_model\\served_model_metadata.json",
+  "endpoint": "http://127.0.0.1:5000/predict",
+  "health_endpoint": "http://127.0.0.1:5000/health"
 }

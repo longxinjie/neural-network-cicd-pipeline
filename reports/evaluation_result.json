@@ -1,5 +1,20 @@
 {
-  "checkpoint": "artifacts\\trained_checkpoints\\mnist_cnn_checkpoint_20260517_000034.pt",
+  "checkpoint": "artifacts\\trained_checkpoints\\mnist_cnn_checkpoint_20260517_002259.pt",
   "accuracy": 0.9322,
+  "precision_macro": 0.935,
+  "recall_macro": 0.9309,
+  "f1_macro": 0.9317,
+  "per_class_accuracy": {
+    "0": 0.9694,
+    "1": 0.9692,
+    "2": 0.9118,
+    "3": 0.9693,
+    "4": 0.946,
+    "5": 0.8374,
+    "6": 0.9489,
+    "7": 0.8979,
+    "8": 0.9168,
+    "9": 0.9425
+  },
   "status": "evaluated"
 }
