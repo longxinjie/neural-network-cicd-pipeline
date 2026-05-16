@@ -174,10 +174,36 @@ def validate():
     print(validation_result)
     print(f"Approved model saved to: {approved_path}")
 
+    handoff_path = Path("artifacts/approved_checkpoint.json")
+    handoff_path.parent.mkdir(parents=True, exist_ok=True)
+
+    handoff = {
+        "approved": True,
+        "checkpoint_path": str(approved_path),
+        "original_checkpoint": str(checkpoint_path),
+        "accuracy": round(accuracy, 4),
+        "min_accuracy": MIN_ACCURACY,
+        "status": status,
+        "source_pipeline": "Continuous Training Pipeline",
+        "next_pipeline": "Model Continuous Delivery Pipeline"
+    }
+
+    with open(handoff_path, "w") as f:
+        json.dump(handoff, f, indent=2)
+
+    task.upload_artifact(
+        name="approved_checkpoint_handoff",
+        artifact_object=str(handoff_path)
+    )
+
+    print(f"Approved checkpoint handoff created: {handoff_path}")
+
     task.upload_artifact("validation_result", "reports/validation_result.json")
     task.upload_artifact("classification_report", "reports/classification_report.json")
     task.upload_artifact("confusion_matrix", "reports/figures/confusion_matrix.png")
     task.upload_artifact("validation_decision", "reports/figures/validation_decision.png")
+    task.upload_artifact("approved_model", str(approved_path))
+    task.upload_artifact("approved_checkpoint_handoff", str(handoff_path))
 
 if __name__ == "__main__":
     validate()
