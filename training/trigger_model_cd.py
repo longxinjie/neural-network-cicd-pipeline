@@ -24,9 +24,8 @@ if not handoff_file.exists():
 print("Approved checkpoint found.")
 print("Triggering Model CD pipeline...")
 
-subprocess.run(
-    ["python", "model_cd/clearml_model_cd_pipeline.py"],
-    check=True
+subprocess.Popen(
+    ["python", "model_cd/clearml_model_cd_pipeline.py"]
 )
 
 task.upload_artifact(
