@@ -1,0 +1,79 @@
+name: Neural Network Pipeline CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+  issues: write
+  statuses: write
+
+jobs:
+  cicd-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup CML
+        uses: iterative/setup-cml@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Check project structure
+        run: |
+          test -f training/train_local_model.py
+          test -f model_cd/validate_checkpoint.py
+          test -f model_cd/register_model.py
+          test -f model_cd/deploy_model.py
+          test -f model_cd/validate_endpoint.py
+          test -f app/serve_model.py
+          test -f monitoring/monitor_model.py
+          test -f pipeline_cd/deploy_pipeline.py
+
+      - name: Run pipeline smoke test
+        run: |
+          python -m py_compile training/train_local_model.py
+          python -m py_compile model_cd/validate_checkpoint.py
+          python -m py_compile model_cd/register_model.py
+          python -m py_compile model_cd/deploy_model.py
+          python -m py_compile model_cd/validate_endpoint.py
+          python -m py_compile app/serve_model.py
+          python -m py_compile monitoring/monitor_model.py
+          python -m py_compile pipeline_cd/deploy_pipeline.py
+
+      - name: Generate CI report
+        run: |
+          mkdir -p reports
+          echo '{ "pipeline_ci_status": "passed", "purpose": "validate ML pipeline code, not train production model" }' > reports/pipeline_ci_result.json
+
+      - name: Run Pipeline CD
+        run: |
+          python pipeline_cd/deploy_pipeline.py
+
+      - name: Generate GitHub summary report
+        run: |
+          echo "# Neural Network Pipeline CI/CD Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Purpose" >> $GITHUB_STEP_SUMMARY
+          echo "This workflow validates the ML pipeline code and deploys the pipeline infrastructure to a staging artifact folder." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "It does not train or deploy a production model. Model training and model delivery are handled separately by the Model CD workflow." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Pipeline CI Result" >> $GITHUB_STEP_SUMMARY
+          cat reports/pipeline_ci_result.json >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Pipeline CD Manifest" >> $GITHUB_STEP_SUMMARY
+          cat artifacts/pipeline_staging/pipeline_deployment_manifest.json >> $GITHUB_STEP_SUMMARY
