@@ -1,0 +1,10 @@
+{
+  "checkpoint": "artifacts\\trained_checkpoints\\mnist_cnn_checkpoint_20260516_224642.pt",
+  "created_at": "20260516_224642",
+  "model_architecture": "SimpleCNN",
+  "training_batches": 300,
+  "train_accuracy": 0.8193,
+  "train_loss": 0.5763,
+  "device": "cpu",
+  "status": "trained"
+}

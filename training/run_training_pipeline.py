@@ -30,15 +30,22 @@ pipe.add_step(
 )
 
 pipe.add_step(
-    name="validate_checkpoint",
-    parents=["train_cnn"],
+    name="evaluate_model",
+    parents=["train_model"],
     base_task_project="Neural-Network-CICD",
-    base_task_name="Validate Checkpoint"
+    base_task_name="Evaluate Model",
+)
+
+pipe.add_step(
+    name="validate_model",
+    parents=["evaluate_model"],
+    base_task_project="Neural-Network-CICD",
+    base_task_name="Validate Model",
 )
 
 pipe.add_step(
     name="trigger_model_cd",
-    parents=["validate_checkpoint"],
+    parents=["validate_model"],
     base_task_project="Neural-Network-CICD",
     base_task_name="Trigger Model CD Pipeline",
 )

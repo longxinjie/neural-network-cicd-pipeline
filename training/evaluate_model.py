@@ -5,27 +5,22 @@ import torch
 import torch.nn as nn
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
-import matplotlib.pyplot as plt
-import numpy as np
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, classification_report
+import matplotlib.pyplot as plt
 
 from clearml import Task
 
 task = Task.init(
     project_name="Neural-Network-CICD",
-    task_name="Validate Checkpoint"
+    task_name="Evaluate Model"
 )
 
 CHECKPOINT_DIR = Path("artifacts/trained_checkpoints")
 OUTPUT_DIR = Path("reports")
 FIGURE_DIR = Path("reports/figures")
-MODEL_PACKAGE_DIR = Path("model_package")
 
 OUTPUT_DIR.mkdir(exist_ok=True)
 FIGURE_DIR.mkdir(parents=True, exist_ok=True)
-MODEL_PACKAGE_DIR.mkdir(exist_ok=True)
-
-MIN_ACCURACY = 0.80
 
 
 class SimpleCNN(nn.Module):
@@ -36,11 +31,9 @@ class SimpleCNN(nn.Module):
             nn.Conv2d(1, 16, kernel_size=3, padding=1),
             nn.ReLU(),
             nn.MaxPool2d(2),
-
             nn.Conv2d(16, 32, kernel_size=3, padding=1),
             nn.ReLU(),
             nn.MaxPool2d(2),
-
             nn.Flatten(),
             nn.Linear(32 * 7 * 7, 64),
             nn.ReLU(),
@@ -53,18 +46,16 @@ class SimpleCNN(nn.Module):
 
 def get_latest_checkpoint():
     checkpoints = list(CHECKPOINT_DIR.glob("*.pt"))
-
     if not checkpoints:
         raise FileNotFoundError("No trained checkpoints found.")
-
     return max(checkpoints, key=lambda p: p.stat().st_mtime)
 
 
-def validate():
+def evaluate():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     checkpoint_path = get_latest_checkpoint()
-    print(f"Validating checkpoint: {checkpoint_path}")
+    print(f"Evaluating checkpoint: {checkpoint_path}")
 
     checkpoint = torch.load(checkpoint_path, map_location=device)
 
@@ -72,9 +63,7 @@ def validate():
     model.load_state_dict(checkpoint["model_state_dict"])
     model.eval()
 
-    transform = transforms.Compose([
-        transforms.ToTensor()
-    ])
+    transform = transforms.Compose([transforms.ToTensor()])
 
     test_dataset = datasets.MNIST(
         root="data",
@@ -91,7 +80,6 @@ def validate():
 
     all_preds = []
     all_labels = []
-
     correct = 0
     total = 0
 
@@ -111,19 +99,15 @@ def validate():
 
     accuracy = correct / total
 
-    status = "PASSED" if accuracy >= MIN_ACCURACY else "FAILED"
-
-    validation_result = {
+    evaluation_result = {
         "checkpoint": str(checkpoint_path),
         "accuracy": round(accuracy, 4),
-        "min_accuracy": MIN_ACCURACY,
-        "status": status
+        "status": "evaluated"
     }
 
-    with open(OUTPUT_DIR / "validation_result.json", "w") as f:
-        json.dump(validation_result, f, indent=2)
+    with open(OUTPUT_DIR / "evaluation_result.json", "w") as f:
+        json.dump(evaluation_result, f, indent=2)
 
-    # Confusion matrix visual
     cm = confusion_matrix(all_labels, all_preds)
 
     disp = ConfusionMatrixDisplay(
@@ -133,12 +117,11 @@ def validate():
 
     fig, ax = plt.subplots(figsize=(8, 8))
     disp.plot(ax=ax)
-    plt.title("Confusion Matrix - Validated MNIST CNN")
+    plt.title("Confusion Matrix - Evaluated MNIST CNN")
     plt.tight_layout()
     plt.savefig(FIGURE_DIR / "confusion_matrix.png")
     plt.close()
 
-    # Classification report
     report = classification_report(
         all_labels,
         all_preds,
@@ -148,62 +131,13 @@ def validate():
     with open(OUTPUT_DIR / "classification_report.json", "w") as f:
         json.dump(report, f, indent=2)
 
-    # Promotion decision visual
-    plt.figure(figsize=(6, 4))
-    plt.bar(["Accuracy", "Threshold"], [accuracy, MIN_ACCURACY])
-    plt.ylim(0, 1)
-    plt.title(f"Model Validation Decision: {status}")
-    plt.ylabel("Score")
-    plt.tight_layout()
-    plt.savefig(FIGURE_DIR / "validation_decision.png")
-    plt.close()
-
-    if status == "FAILED":
-        raise ValueError(
-            f"Model rejected. Accuracy {accuracy:.4f} < threshold {MIN_ACCURACY}"
-        )
-
-    # Copy approved checkpoint to model package
-    approved_path = MODEL_PACKAGE_DIR / "approved_model.pt"
-    torch.save(checkpoint, approved_path)
-
-    with open(MODEL_PACKAGE_DIR / "approved_model_metadata.json", "w") as f:
-        json.dump(validation_result, f, indent=2)
-
-    print("Validation complete.")
-    print(validation_result)
-    print(f"Approved model saved to: {approved_path}")
-
-    handoff_path = Path("artifacts/approved_checkpoint.json")
-    handoff_path.parent.mkdir(parents=True, exist_ok=True)
-
-    handoff = {
-        "approved": True,
-        "checkpoint_path": str(approved_path),
-        "original_checkpoint": str(checkpoint_path),
-        "accuracy": round(accuracy, 4),
-        "min_accuracy": MIN_ACCURACY,
-        "status": status,
-        "source_pipeline": "Continuous Training Pipeline",
-        "next_pipeline": "Model Continuous Delivery Pipeline"
-    }
-
-    with open(handoff_path, "w") as f:
-        json.dump(handoff, f, indent=2)
-
-    task.upload_artifact(
-        name="approved_checkpoint_handoff",
-        artifact_object=str(handoff_path)
-    )
-
-    print(f"Approved checkpoint handoff created: {handoff_path}")
-
-    task.upload_artifact("validation_result", "reports/validation_result.json")
+    task.upload_artifact("evaluation_result", "reports/evaluation_result.json")
     task.upload_artifact("classification_report", "reports/classification_report.json")
     task.upload_artifact("confusion_matrix", "reports/figures/confusion_matrix.png")
-    task.upload_artifact("validation_decision", "reports/figures/validation_decision.png")
-    task.upload_artifact("approved_model", str(approved_path))
-    task.upload_artifact("approved_checkpoint_handoff", str(handoff_path))
+
+    print("Evaluation complete.")
+    print(evaluation_result)
+
 
 if __name__ == "__main__":
-    validate()
+    evaluate()

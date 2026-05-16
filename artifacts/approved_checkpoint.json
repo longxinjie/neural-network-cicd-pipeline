@@ -1,0 +1,10 @@
+{
+  "approved": true,
+  "checkpoint_path": "model_package\\approved_model.pt",
+  "original_checkpoint": "artifacts\\trained_checkpoints\\mnist_cnn_checkpoint_20260516_224642.pt",
+  "accuracy": 0.9322,
+  "min_accuracy": 0.8,
+  "status": "PASSED",
+  "source_pipeline": "Continuous Training Pipeline",
+  "next_pipeline": "Model Continuous Delivery Pipeline"
+}
