@@ -2,8 +2,8 @@ from clearml import PipelineController
 
 pipe = PipelineController(
     project="Neural-Network-CICD",
-    name="Remote Model Continuous Delivery Pipeline",
-    version="1.0.1",
+    name="Model Continuous Delivery Pipeline",
+    version="1.0.0",
     add_pipeline_tags=True,
 )
 
@@ -36,6 +36,6 @@ pipe.add_step(
     base_task_name="Validate Deployment Endpoint",
 )
 
-print("Submitting remote Model CD pipeline to ClearML queue...")
 pipe.start_locally(run_pipeline_steps_locally=True)
-print("Pipeline submitted.")
+
+print("Model CD Pipeline submitted.")

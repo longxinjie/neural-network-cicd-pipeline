@@ -1,7 +1,7 @@
 {
   "deployment_stage": "staging",
   "status": "deployed",
-  "deployed_at": "2026-05-16T17:32:41.445633",
+  "deployed_at": "2026-05-16T18:59:54.067620",
   "model_file": "artifacts\\deployed_model\\served_model.pt",
   "metadata_file": "artifacts\\deployed_model\\served_model_metadata.json"
 }
