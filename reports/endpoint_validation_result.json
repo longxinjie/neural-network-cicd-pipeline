@@ -1,20 +1,24 @@
 {
-  "endpoint": "http://127.0.0.1:5000",
-  "health_check": {
-    "accuracy": 0.9322,
-    "model_architecture": null,
-    "model_loaded": true,
-    "status": "healthy"
-  },
-  "prediction_response": {
-    "confidence": 0.3806,
-    "model_metadata": {
-      "accuracy": 0.9322,
-      "checkpoint": "artifacts\\trained_checkpoints\\mnist_cnn_checkpoint_20260517_002259.pt",
-      "min_accuracy": 0.8,
-      "status": "PASSED"
+    "endpoint": "http://127.0.0.1:5000",
+    "health_check": {
+        "accuracy": 0.9322,
+        "model_architecture": null,
+        "model_loaded": true,
+        "status": "healthy"
     },
-    "predicted_digit": 5
-  },
-  "status": "PASSED"
+    "prediction_response": {
+        "confidence": 0.3806,
+        "model_metadata": {
+            "accuracy": 0.9322,
+            "checkpoint": "artifacts\\trained_checkpoints\\mnist_cnn_checkpoint_20260517_002259.pt",
+            "min_accuracy": 0.8,
+            "status": "PASSED"
+        },
+        "predicted_digit": 5
+    },
+    "status": "PASSED",
+    "health_latency_ms": 5.926847457885742,
+    "prediction_latency_ms": 18.04041862487793,
+    "predicted_class": null,
+    "prediction_confidence": 0.3806
 }

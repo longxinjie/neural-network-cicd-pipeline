@@ -1,0 +1,16 @@
+{
+    "timestamp": "2026-05-17T00:44:49.464597",
+    "retrain": true,
+    "decision_value": 1,
+    "reason": "New data trigger detected",
+    "trigger_info": {
+        "new_data_received": true,
+        "source": "simulated_new_mnist_data",
+        "created_at": "2026-05-17T00:44:30.048416",
+        "reason": "New production-like data received for retraining demo",
+        "num_new_samples": 100,
+        "drift_score": 0.42,
+        "avg_prediction_confidence": 0.71,
+        "trigger_stage": "feedback_loop"
+    }
+}

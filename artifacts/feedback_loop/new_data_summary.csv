@@ -1,0 +1,4 @@
+metric,value
+num_new_samples,100.0
+drift_score,0.42
+avg_prediction_confidence,0.71

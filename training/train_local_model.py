@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import matplotlib.pyplot as plt
+import pandas as pd
 
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
@@ -27,10 +28,13 @@ logger = task.get_logger()
 CHECKPOINT_DIR = Path("artifacts/trained_checkpoints")
 CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
+ARTIFACT_DIR = Path("artifacts")
+ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
+
 REPORTS_DIR = Path("reports")
 FIGURE_DIR = REPORTS_DIR / "figures"
 
-REPORTS_DIR.mkdir(exist_ok=True)
+REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 FIGURE_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -290,6 +294,40 @@ def train():
     with open(metadata_path, "w") as f:
         json.dump(metadata, f, indent=2)
 
+    # =========================
+    # Extra files for retrain_trigger.py
+    # =========================
+    training_metrics = {
+        "train_accuracy": float(train_accuracy),
+        "train_loss": float(avg_loss),
+        "training_batches": int(actual_batches)
+    }
+
+    training_metrics_path = ARTIFACT_DIR / "training_metrics.json"
+
+    with open(training_metrics_path, "w") as f:
+        json.dump(training_metrics, f, indent=4)
+
+    history_df = pd.DataFrame({
+        "epoch": iterations,
+        "batch_loss": batch_losses,
+        "average_loss": avg_losses,
+        "running_accuracy": running_accuracies
+    })
+
+    training_history_path = ARTIFACT_DIR / "training_history.csv"
+    history_df.to_csv(training_history_path, index=False)
+
+    task.upload_artifact(
+        name="training_metrics_json",
+        artifact_object=str(training_metrics_path)
+    )
+
+    task.upload_artifact(
+        name="training_history_csv",
+        artifact_object=str(training_history_path)
+    )
+
     logger.report_text(
         f"""
 # CNN Training Summary
@@ -298,6 +336,8 @@ def train():
 - Training Loss: {avg_loss:.4f}
 - Checkpoint: {checkpoint_path}
 - Metadata: {metadata_path}
+- Metrics JSON: {training_metrics_path}
+- Training History CSV: {training_history_path}
 - Loss Curve: {loss_curve_path}
 - Accuracy Curve: {accuracy_curve_path}
 - Sample Predictions: {sample_predictions_path}
@@ -339,8 +379,12 @@ def train():
     print("\nTraining complete!")
     print(f"Checkpoint saved to: {checkpoint_path}")
     print(f"Metadata saved to: {metadata_path}")
+    print(f"Metrics saved to: {training_metrics_path}")
+    print(f"History saved to: {training_history_path}")
     print(f"Training accuracy: {train_accuracy:.4f}")
     print(f"Training loss: {avg_loss:.4f}")
+
+    task.close()
 
 
 if __name__ == "__main__":
