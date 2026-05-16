@@ -36,4 +36,11 @@ pipe.add_step(
     base_task_name="Validate Checkpoint"
 )
 
+pipe.add_step(
+    name="trigger_model_cd",
+    parents=["validate_checkpoint"],
+    base_task_project="Neural-Network-CICD",
+    base_task_name="Trigger Model CD Pipeline",
+)
+
 pipe.start_locally(run_pipeline_steps_locally=True)

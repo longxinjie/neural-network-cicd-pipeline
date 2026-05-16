@@ -1,5 +1,5 @@
 {
-  "checkpoint": "artifacts\\trained_checkpoints\\mnist_cnn_checkpoint_20260516_214654.pt",
+  "checkpoint": "artifacts\\trained_checkpoints\\mnist_cnn_checkpoint_20260516_221352.pt",
   "accuracy": 0.9322,
   "min_accuracy": 0.8,
   "status": "PASSED"
