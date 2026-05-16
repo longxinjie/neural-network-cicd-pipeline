@@ -15,7 +15,7 @@ FIGURE_DIR = Path("reports/figures")
 OUTPUT_DIR.mkdir(exist_ok=True)
 FIGURE_DIR.mkdir(parents=True, exist_ok=True)
 
-BASE_URL = "http://host.docker.internal:5000"
+BASE_URL = "http://127.0.0.1:5000"
 
 # 1. Health check
 health = requests.get(f"{BASE_URL}/health", timeout=10).json()

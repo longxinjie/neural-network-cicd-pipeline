@@ -37,5 +37,5 @@ pipe.add_step(
 )
 
 print("Submitting remote Model CD pipeline to ClearML queue...")
-pipe.start(queue="default")
+pipe.start_locally(run_pipeline_steps_locally=True)
 print("Pipeline submitted.")
