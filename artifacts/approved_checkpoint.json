@@ -1,7 +1,7 @@
 {
   "approved": true,
   "checkpoint_path": "model_package\\approved_model.pt",
-  "original_checkpoint": "artifacts\\trained_checkpoints\\mnist_cnn_checkpoint_20260516_233023.pt",
+  "original_checkpoint": "artifacts\\trained_checkpoints\\mnist_cnn_checkpoint_20260516_234223.pt",
   "accuracy": 0.9322,
   "min_accuracy": 0.8,
   "status": "PASSED",
