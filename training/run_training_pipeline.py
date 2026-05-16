@@ -31,7 +31,7 @@ pipe.add_step(
 
 pipe.add_step(
     name="evaluate_model",
-    parents=["train_model"],
+    parents=["train_cnn"],
     base_task_project="Neural-Network-CICD",
     base_task_name="Evaluate Model",
 )
