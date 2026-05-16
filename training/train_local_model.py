@@ -19,6 +19,8 @@ task = Task.init(
     task_name="Local CNN Training"
 )
 
+logger = task.get_logger()
+
 CHECKPOINT_DIR = Path("artifacts/trained_checkpoints")
 CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -104,8 +106,36 @@ def train():
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
 
+        current_accuracy = correct / total
+        current_avg_loss = running_loss / (batch_idx + 1)
+
+        logger.report_scalar(
+            title="Training Loss",
+            series="batch_loss",
+            value=loss.item(),
+            iteration=batch_idx
+        )
+
+        logger.report_scalar(
+            title="Training Loss",
+            series="average_loss",
+            value=current_avg_loss,
+            iteration=batch_idx
+        )
+
+        logger.report_scalar(
+            title="Training Accuracy",
+            series="running_accuracy",
+            value=current_accuracy,
+            iteration=batch_idx
+        )
+
         if batch_idx % 50 == 0:
-            print(f"Batch {batch_idx}/{max_batches}, Loss: {loss.item():.4f}")
+            print(
+                f"Batch {batch_idx}/{max_batches}, "
+                f"Loss: {loss.item():.4f}, "
+                f"Running Accuracy: {current_accuracy:.4f}"
+            )
 
     train_accuracy = correct / total
     avg_loss = running_loss / max_batches
@@ -142,6 +172,19 @@ def train():
     print(f"Metadata saved to: {metadata_path}")
     print(f"Training accuracy: {train_accuracy:.4f}")
     print(f"Training loss: {avg_loss:.4f}")
+
+    logger.report_text(
+        f"""
+# CNN Training Summary
+
+- Training Accuracy: {train_accuracy:.4f}
+- Training Loss: {avg_loss:.4f}
+- Checkpoint: {checkpoint_path}
+- Metadata: {metadata_path}
+- Device: {device}
+- Status: trained
+"""
+    )
 
     task.upload_artifact(
         name="trained_checkpoint",

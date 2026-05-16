@@ -15,6 +15,8 @@ task = Task.init(
     task_name="Evaluate Model"
 )
 
+logger = task.get_logger()
+
 CHECKPOINT_DIR = Path("artifacts/trained_checkpoints")
 OUTPUT_DIR = Path("reports")
 FIGURE_DIR = Path("reports/figures")
@@ -99,6 +101,13 @@ def evaluate():
 
     accuracy = correct / total
 
+    logger.report_scalar(
+        title="Evaluation Accuracy",
+        series="accuracy",
+        value=accuracy,
+        iteration=0
+    )
+
     evaluation_result = {
         "checkpoint": str(checkpoint_path),
         "accuracy": round(accuracy, 4),
@@ -115,12 +124,21 @@ def evaluate():
         display_labels=list(range(10))
     )
 
+    confusion_matrix_path = FIGURE_DIR / "confusion_matrix.png"
+
     fig, ax = plt.subplots(figsize=(8, 8))
     disp.plot(ax=ax)
     plt.title("Confusion Matrix - Evaluated MNIST CNN")
     plt.tight_layout()
-    plt.savefig(FIGURE_DIR / "confusion_matrix.png")
+    plt.savefig(confusion_matrix_path)
     plt.close()
+
+    logger.report_image(
+        title="Confusion Matrix",
+        series="mnist_cnn",
+        local_path=str(confusion_matrix_path),
+        iteration=0
+    )
 
     report = classification_report(
         all_labels,
@@ -130,6 +148,17 @@ def evaluate():
 
     with open(OUTPUT_DIR / "classification_report.json", "w") as f:
         json.dump(report, f, indent=2)
+
+    logger.report_text(
+        f"""
+# Model Evaluation Summary
+
+- Checkpoint: {checkpoint_path}
+- Evaluation Accuracy: {accuracy:.4f}
+- Status: evaluated
+- Confusion Matrix: {confusion_matrix_path}
+"""
+    )
 
     task.upload_artifact("evaluation_result", "reports/evaluation_result.json")
     task.upload_artifact("classification_report", "reports/classification_report.json")
