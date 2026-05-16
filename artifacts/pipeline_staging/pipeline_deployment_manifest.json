@@ -1,0 +1,12 @@
+{
+  "deployment_type": "pipeline_cd",
+  "stage": "staging",
+  "status": "deployed",
+  "deployed_at": "2026-05-16T15:34:32.587411",
+  "deployed_components": [
+    "Flask serving application",
+    "Model CD workflow scripts",
+    "Monitoring script"
+  ],
+  "purpose": "Deploy ML pipeline infrastructure and serving workflow, not model weights"
+}
