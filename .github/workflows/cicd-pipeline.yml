@@ -54,8 +54,6 @@ jobs:
           test -f monitoring/monitor_model.py
 
           test -f pipeline_cd/deploy_pipeline.py
-          test -f pipeline_cd/register_model_clearml.py
-          test -f pipeline_cd/validate_deployment.py
 
       - name: Generate CI report
         run: |
