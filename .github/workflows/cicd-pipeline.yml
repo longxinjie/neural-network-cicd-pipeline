@@ -66,15 +66,70 @@ jobs:
 
       - name: Generate GitHub summary report
         run: |
-          echo "# Neural Network Pipeline CI/CD Report" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## Purpose" >> $GITHUB_STEP_SUMMARY
-          echo "This workflow validates the ML pipeline code and deploys the pipeline infrastructure to a staging artifact folder." >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "It does not train or deploy a production model. Model training and model delivery are handled separately by the Model CD workflow." >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## Pipeline CI Result" >> $GITHUB_STEP_SUMMARY
-          cat reports/pipeline_ci_result.json >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## Pipeline CD Manifest" >> $GITHUB_STEP_SUMMARY
-          cat artifacts/pipeline_staging/pipeline_deployment_manifest.json >> $GITHUB_STEP_SUMMARY
+          {
+            echo "# Neural Network Pipeline CI/CD Report"
+            echo ""
+            echo "## Pipeline Status"
+            echo "| Stage | Status | Purpose |"
+            echo "|---|---|---|"
+            echo "| Pipeline CI | Passed | Validates ML pipeline structure and dependencies |"
+            echo "| Pipeline CD | Deployed | Packages pipeline infrastructure into staging |"
+            echo "| Staging | Ready | Stores deployment-ready workflow components |"
+            echo ""
+            
+            echo "## CI/CD Execution Flow"
+            echo '```text'
+            echo "Code Push / Pull Request"
+            echo "        ↓"
+            echo "GitHub Actions Triggered"
+            echo "        ↓"
+            echo "Environment Setup"
+            echo "        ↓"
+            echo "ML Pipeline Structure Validation"
+            echo "        ↓"
+            echo "CI Report Generated"
+            echo "        ↓"
+            echo "Pipeline CD Executed"
+            echo "        ↓"
+            echo "Staging Infrastructure Prepared"
+            echo '```'
+            echo ""
+
+            echo "## Components Validated"
+            echo "- Training workflow scripts"
+            echo "- Model CD workflow scripts"
+            echo "- Flask serving application"
+            echo "- Monitoring script"
+            echo "- Feedback and retraining scripts"
+            echo "- Pipeline deployment script"
+            echo ""
+
+            echo "## Staging Deployment Summary"
+            echo "| Item | Description |"
+            echo "|---|---|"
+            echo "| Deployment Type | Pipeline CD |"
+            echo "| Stage | Staging |"
+            echo "| Target Folder | artifacts/pipeline_staging/ |"
+            echo "| Deployed Components | Serving app, monitoring script, Model CD workflows |"
+            echo "| Model Weights | Not deployed in this stage |"
+            echo ""
+
+            echo "## Architecture Distinction"
+            echo "| Layer | Role |"
+            echo "|---|---|"
+            echo "| Pipeline CI | Validates ML pipeline code and project structure |"
+            echo "| Pipeline CD | Deploys pipeline infrastructure to staging |"
+            echo "| Model CD | Handles trained model registration and delivery separately |"
+            echo ""
+
+            echo "## Raw CI Result"
+            echo '```json'
+            cat reports/pipeline_ci_result.json
+            echo '```'
+            echo ""
+
+            echo "## Raw Pipeline CD Manifest"
+            echo '```json'
+            cat artifacts/pipeline_staging/pipeline_deployment_manifest.json
+            echo '```'
+          } >> $GITHUB_STEP_SUMMARY
