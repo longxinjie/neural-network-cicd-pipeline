@@ -114,17 +114,31 @@ jobs:
           echo "| Model Weights | Not deployed in this stage |" >> report.md
           echo "" >> report.md
 
+          echo "## Architecture Distinction" >> report.md
+          echo "| Layer | Role |" >> report.md
+          echo "|---|---|" >> report.md
+          echo "| Pipeline CI | Validates ML pipeline code and project structure |" >> report.md
+          echo "| Pipeline CD | Deploys pipeline infrastructure to staging |" >> report.md
+          echo "| Model CD | Handles trained model registration and delivery separately |" >> report.md
+          echo "" >> report.md
+
           echo "## Raw CI Result" >> report.md
           echo '```json' >> report.md
           cat reports/pipeline_ci_result.json >> report.md
           echo '```' >> report.md
+          echo "" >> report.md
 
           echo "## Raw Pipeline CD Manifest" >> report.md
           echo '```json' >> report.md
           cat artifacts/pipeline_staging/pipeline_deployment_manifest.json >> report.md
           echo '```' >> report.md
 
+      - name: Publish GitHub summary
+        run: |
+          cat report.md >> $GITHUB_STEP_SUMMARY
+
       - name: Publish CML report
+        if: github.event_name == 'pull_request'
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
