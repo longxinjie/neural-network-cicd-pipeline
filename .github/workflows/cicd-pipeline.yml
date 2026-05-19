@@ -66,7 +66,7 @@ jobs:
 
       - name: Generate CML report
         run: |
-          echo "# Neural Network Pipeline CI/CD Report" > report.md
+          echo "# Neural Network Pipeline CI/CD Report with CML" > report.md
           echo "" >> report.md
 
           echo "## Pipeline Status" >> report.md
