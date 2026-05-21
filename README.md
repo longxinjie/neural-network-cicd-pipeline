@@ -34,5 +34,5 @@ Flask Inference Endpoint
       ↓
 Monitoring & Feedback Loop
 
-## CI/CD Demo Trigger 2
+## CI/CD Demo Trigger 3
 Pipeline validation rerun.
