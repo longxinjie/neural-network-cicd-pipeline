@@ -1,0 +1,15 @@
+{
+  "checkpoint": "artifacts\\trained_checkpoints\\mnist_cnn_checkpoint_20260521_142828.pt",
+  "created_at": "20260521_142828",
+  "model_architecture": "SimpleCNN",
+  "training_batches": 300,
+  "train_accuracy": 0.8193,
+  "train_loss": 0.5763,
+  "device": "cpu",
+  "plots": {
+    "training_loss_curve": "reports\\figures\\training_loss_curve.png",
+    "training_accuracy_curve": "reports\\figures\\training_accuracy_curve.png",
+    "sample_predictions": "reports\\figures\\sample_training_predictions.png"
+  },
+  "status": "trained"
+}
