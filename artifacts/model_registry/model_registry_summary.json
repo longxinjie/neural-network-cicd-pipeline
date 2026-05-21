@@ -1,7 +1,7 @@
 {
     "model_name": "approved_mnist_cnn",
     "framework": "PyTorch",
-    "registered_at": "2026-05-17T00:58:47.614297",
+    "registered_at": "2026-05-21T14:31:14.695625",
     "model_path": "model_package\\approved_model.pt",
     "metadata_path": "model_package\\approved_model_metadata.json",
     "model_size_mb": 0.4076375961303711,

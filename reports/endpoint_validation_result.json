@@ -10,15 +10,15 @@
         "confidence": 0.3806,
         "model_metadata": {
             "accuracy": 0.9322,
-            "checkpoint": "artifacts\\trained_checkpoints\\mnist_cnn_checkpoint_20260517_002259.pt",
+            "checkpoint": "artifacts\\trained_checkpoints\\mnist_cnn_checkpoint_20260521_142828.pt",
             "min_accuracy": 0.8,
             "status": "PASSED"
         },
         "predicted_digit": 5
     },
     "status": "PASSED",
-    "health_latency_ms": 17.374277114868164,
-    "prediction_latency_ms": 22.07636833190918,
+    "health_latency_ms": 15.213251113891602,
+    "prediction_latency_ms": 117.5374984741211,
     "predicted_class": null,
     "prediction_confidence": 0.3806
 }
