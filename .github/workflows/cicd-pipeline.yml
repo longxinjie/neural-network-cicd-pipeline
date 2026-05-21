@@ -32,106 +32,159 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Check project structure
-        run: |
-          test -f training/train_local_model.py
-          test -f training/evaluate_model.py
-          test -f training/validate_model.py
-          test -f training/run_training_pipeline.py
-          test -f training/trigger_model_cd.py
-
-          test -f model_cd/register_model.py
-          test -f model_cd/deploy_model.py
-          test -f model_cd/validate_endpoint.py
-          test -f model_cd/clearml_model_cd_pipeline.py
-          test -f model_cd/run_model_cd.py
-
-          test -f app/serve_model.py
-
-          test -f feedback/simulate_new_data.py
-          test -f feedback/retrain_trigger.py
-
-          test -f monitoring/monitor_model.py
-
-          test -f pipeline_cd/deploy_pipeline.py
-
-      - name: Generate CI report
+      - name: Validate ML pipeline structure
         run: |
           mkdir -p reports
-          echo '{ "pipeline_ci_status": "passed", "purpose": "validate ML pipeline code, not train production model" }' > reports/pipeline_ci_result.json
+
+          REQUIRED_FILES=(
+            "training/train_local_model.py"
+            "training/evaluate_model.py"
+            "training/validate_model.py"
+            "training/run_training_pipeline.py"
+            "training/trigger_model_cd.py"
+            "model_cd/register_model.py"
+            "model_cd/deploy_model.py"
+            "model_cd/validate_endpoint.py"
+            "model_cd/clearml_model_cd_pipeline.py"
+            "model_cd/run_model_cd.py"
+            "app/serve_model.py"
+            "feedback/simulate_new_data.py"
+            "feedback/retrain_trigger.py"
+            "monitoring/monitor_model.py"
+            "pipeline_cd/deploy_pipeline.py"
+          )
+
+          MISSING_FILES=()
+          VALIDATED_FILES=()
+
+          for file in "${REQUIRED_FILES[@]}"; do
+            if [ -f "$file" ]; then
+              VALIDATED_FILES+=("$file")
+            else
+              MISSING_FILES+=("$file")
+            fi
+          done
+
+          if [ ${#MISSING_FILES[@]} -eq 0 ]; then
+            CI_STATUS="passed"
+          else
+            CI_STATUS="failed"
+          fi
+
+          python - <<EOF
+          import json
+          from datetime import datetime
+
+          validated_files = """${VALIDATED_FILES[*]}""".split()
+          missing_files = """${MISSING_FILES[*]}""".split()
+
+          result = {
+              "pipeline_ci_status": "$CI_STATUS",
+              "validated_file_count": len(validated_files),
+              "missing_file_count": len(missing_files),
+              "validated_files": validated_files,
+              "missing_files": missing_files,
+              "checked_at": datetime.now().isoformat(),
+              "purpose": "Validate ML pipeline structure before deployment"
+          }
+
+          with open("reports/pipeline_ci_result.json", "w") as f:
+              json.dump(result, f, indent=2)
+          EOF
+
+          cat reports/pipeline_ci_result.json
+
+          if [ "$CI_STATUS" = "failed" ]; then
+            echo "Missing required files detected."
+            exit 1
+          fi
 
       - name: Run Pipeline CD
         run: |
           python pipeline_cd/deploy_pipeline.py
 
-      - name: Generate CML report
+      - name: Generate CML report dynamically
         run: |
-          echo "# Neural Network Pipeline CI/CD Report with CML" > report.md
-          echo "" >> report.md
+          python - <<'EOF'
+          import json
+          from pathlib import Path
 
-          echo "## Pipeline Status" >> report.md
-          echo "| Stage | Status | Purpose |" >> report.md
-          echo "|---|---|---|" >> report.md
-          echo "| Pipeline CI | Passed | Validates ML pipeline structure and dependencies |" >> report.md
-          echo "| Pipeline CD | Deployed | Packages pipeline infrastructure into staging |" >> report.md
-          echo "| Staging | Ready | Stores deployment-ready workflow components |" >> report.md
-          echo "" >> report.md
+          ci_path = Path("reports/pipeline_ci_result.json")
+          manifest_path = Path("artifacts/pipeline_staging/pipeline_deployment_manifest.json")
 
-          echo "## CI/CD Execution Flow" >> report.md
-          echo '```text' >> report.md
-          echo "Code Push / Pull Request" >> report.md
-          echo "        ↓" >> report.md
-          echo "GitHub Actions Triggered" >> report.md
-          echo "        ↓" >> report.md
-          echo "Environment Setup" >> report.md
-          echo "        ↓" >> report.md
-          echo "ML Pipeline Structure Validation" >> report.md
-          echo "        ↓" >> report.md
-          echo "CI Report Generated" >> report.md
-          echo "        ↓" >> report.md
-          echo "Pipeline CD Executed" >> report.md
-          echo "        ↓" >> report.md
-          echo "Staging Infrastructure Prepared" >> report.md
-          echo '```' >> report.md
-          echo "" >> report.md
+          ci = json.loads(ci_path.read_text())
+          manifest = json.loads(manifest_path.read_text())
 
-          echo "## Components Validated" >> report.md
-          echo "- Training workflow scripts" >> report.md
-          echo "- Model CD workflow scripts" >> report.md
-          echo "- Flask serving application" >> report.md
-          echo "- Monitoring script" >> report.md
-          echo "- Feedback and retraining scripts" >> report.md
-          echo "- Pipeline deployment script" >> report.md
-          echo "" >> report.md
+          ci_status = ci.get("pipeline_ci_status", "unknown").upper()
+          cd_status = manifest.get("status", "unknown").upper()
+          stage = manifest.get("stage", "unknown")
+          deployment_type = manifest.get("deployment_type", "unknown")
+          deployed_components = manifest.get("deployed_components", [])
+          target_folder = "artifacts/pipeline_staging/"
 
-          echo "## Staging Deployment Summary" >> report.md
-          echo "| Item | Description |" >> report.md
-          echo "|---|---|" >> report.md
-          echo "| Deployment Type | Pipeline CD |" >> report.md
-          echo "| Stage | Staging |" >> report.md
-          echo "| Target Folder | artifacts/pipeline_staging/ |" >> report.md
-          echo "| Deployed Components | Serving app, monitoring script, Model CD workflows |" >> report.md
-          echo "| Model Weights | Not deployed in this stage |" >> report.md
-          echo "" >> report.md
+          with open("report.md", "w") as f:
+              f.write("# Neural Network Pipeline CI/CD Report with CML\n\n")
 
-          echo "## Architecture Distinction" >> report.md
-          echo "| Layer | Role |" >> report.md
-          echo "|---|---|" >> report.md
-          echo "| Pipeline CI | Validates ML pipeline code and project structure |" >> report.md
-          echo "| Pipeline CD | Deploys pipeline infrastructure to staging |" >> report.md
-          echo "| Model CD | Handles trained model registration and delivery separately |" >> report.md
-          echo "" >> report.md
+              f.write("## Pipeline Status\n")
+              f.write("| Stage | Runtime Status | Runtime Evidence |\n")
+              f.write("|---|---|---|\n")
+              f.write(f"| Pipeline CI | {ci_status} | {ci.get('validated_file_count', 0)} files validated, {ci.get('missing_file_count', 0)} missing |\n")
+              f.write(f"| Pipeline CD | {cd_status} | Deployment type: {deployment_type} |\n")
+              f.write(f"| Staging | {stage.upper()} | Target folder: `{target_folder}` |\n\n")
 
-          echo "## Raw CI Result" >> report.md
-          echo '```json' >> report.md
-          cat reports/pipeline_ci_result.json >> report.md
-          echo '```' >> report.md
-          echo "" >> report.md
+              f.write("## CI/CD Execution Flow\n")
+              f.write("```text\n")
+              f.write("Code Push / Pull Request\n")
+              f.write("        ↓\n")
+              f.write("GitHub Actions Triggered\n")
+              f.write("        ↓\n")
+              f.write("CML + Python Environment Setup\n")
+              f.write("        ↓\n")
+              f.write("ML Pipeline Structure Validation\n")
+              f.write("        ↓\n")
+              f.write("CI Validation Result Generated\n")
+              f.write("        ↓\n")
+              f.write("Pipeline CD Script Executed\n")
+              f.write("        ↓\n")
+              f.write("Pipeline Components Copied to Staging\n")
+              f.write("        ↓\n")
+              f.write("Deployment Manifest Generated\n")
+              f.write("        ↓\n")
+              f.write("CML Publishes This Report to Pull Request\n")
+              f.write("```\n\n")
 
-          echo "## Raw Pipeline CD Manifest" >> report.md
-          echo '```json' >> report.md
-          cat artifacts/pipeline_staging/pipeline_deployment_manifest.json >> report.md
-          echo '```' >> report.md
+              f.write("## Validated ML Pipeline Components\n")
+              for file in ci.get("validated_files", []):
+                  f.write(f"- `{file}`\n")
+              f.write("\n")
+
+              f.write("## Staging Deployment Summary\n")
+              f.write("| Item | Runtime Value |\n")
+              f.write("|---|---|\n")
+              f.write(f"| Deployment Type | {deployment_type} |\n")
+              f.write(f"| Stage | {stage} |\n")
+              f.write(f"| Status | {manifest.get('status', 'unknown')} |\n")
+              f.write(f"| Target Folder | `{target_folder}` |\n")
+              f.write(f"| Deployed At | {manifest.get('deployed_at', 'unknown')} |\n")
+              f.write("| Deployed Components | " + ", ".join(deployed_components) + " |\n\n")
+
+              f.write("## Architecture Distinction\n")
+              f.write("| Layer | Role |\n")
+              f.write("|---|---|\n")
+              f.write("| Pipeline CI | Validates ML pipeline code and required project structure |\n")
+              f.write("| Pipeline CD | Deploys pipeline infrastructure to staging artifacts folder |\n")
+              f.write("| Model CD | Handles trained model registration and delivery separately |\n\n")
+
+              f.write("## Raw CI Result\n")
+              f.write("```json\n")
+              f.write(json.dumps(ci, indent=2))
+              f.write("\n```\n\n")
+
+              f.write("## Raw Pipeline CD Manifest\n")
+              f.write("```json\n")
+              f.write(json.dumps(manifest, indent=2))
+              f.write("\n```\n")
+          EOF
 
       - name: Publish GitHub summary
         run: |
@@ -143,3 +196,12 @@ jobs:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cml comment create report.md
+
+      - name: Upload pipeline reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-cicd-reports
+          path: |
+            report.md
+            reports/pipeline_ci_result.json
+            artifacts/pipeline_staging/pipeline_deployment_manifest.json

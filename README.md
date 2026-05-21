@@ -33,3 +33,6 @@ Local Staging Deployment
 Flask Inference Endpoint
       ↓
 Monitoring & Feedback Loop
+
+## CI/CD Demo Trigger 1
+Pipeline validation rerun.
